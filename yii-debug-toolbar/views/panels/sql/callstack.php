@@ -11,7 +11,10 @@
         <?php foreach($callstack as $id=>$entry):?>
         <tr class="<?php echo ($id%2?'odd':'even') ?><?php echo ($entry[1]>$this->timeLimit?' warning':'') ?>">
             <td class="text-right"><?php echo $id; ?></td>
-            <td width="100%"><?php echo $entry[0]; ?></td>
+            <td width="100%">
+                <div class="collapsible collapsed"><?php echo $entry[0]; ?></div>
+                <div><?php echo implode('<br />', $entry[3]); ?></div>
+            </td>
             <td nowrap="nowrap">
             <?php echo sprintf('%0.6F',$entry[1]); ?>
             </td>

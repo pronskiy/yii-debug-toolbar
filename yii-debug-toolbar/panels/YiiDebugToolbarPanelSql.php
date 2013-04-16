@@ -165,7 +165,7 @@ class YiiDebugToolbarPanelSql extends YiiDebugToolbarPanel
             'connections'       => $this->getDbConnections(),
             'connectionsCount'  => $this->getDbConnectionsCount(),
             'summary'           => $this->processSummary($logs),
-            'callstack'         => $this->processCallstack($logs)
+            'callstack'         => $this->processCallstack($logs, $this->getDebugStackTrace())
         ));
     }
 
@@ -229,7 +229,7 @@ class YiiDebugToolbarPanelSql extends YiiDebugToolbarPanel
      * @param array $logs Logs.
      * @return array
      */
-    protected function processCallstack(array $logs)
+    protected function processCallstack(array $logs, array $debugStackTrace)
     {
         if (empty($logs))
         {
@@ -260,7 +260,8 @@ class YiiDebugToolbarPanelSql extends YiiDebugToolbarPanel
                 if(null !== ($last = array_pop($stack)) && $last[0] === $token)
                 {
                     $delta = $log[3] - $last[3];
-                    $results[$last[4]] = array($token, $delta, count($stack));
+                    $results[$last[4]] = array(
+                        $token, $delta, count($stack), $debugStackTrace[$last[4]]);
                 }
                 else
                     throw new CException(Yii::t('yii-debug-toolbar',
@@ -384,6 +385,15 @@ class YiiDebugToolbarPanelSql extends YiiDebugToolbarPanel
         }
 
         $entry[0] = strip_tags($entry[0], '<div>,<span>');
+
+        if (is_array($entry[3]))
+            foreach ($entry[3] as &$traceItem)
+            {
+                $traceItem = (isset($traceItem['file']))
+                    ? ($traceItem['file'] . ':' . $traceItem['line'])
+                    : ($traceItem['class'] . ':' . $traceItem['function'] . '()');
+            }
+
         return $entry;
     }
 
@@ -451,6 +461,11 @@ class YiiDebugToolbarPanelSql extends YiiDebugToolbarPanel
             }
         }
         return $logs;
+    }
+
+    protected function getDebugStackTrace()
+    {
+        return Yii::app()->db->getDebugStackTrace();
     }
 
 }

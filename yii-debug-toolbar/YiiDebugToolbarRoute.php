@@ -61,7 +61,8 @@ class YiiDebugToolbarRoute extends CLogRoute
 
 
     private $_proxyMap = array(
-        'viewRenderer' => 'YiiDebugViewRenderer'
+        'viewRenderer' => 'YiiDebugViewRenderer',
+        'db' => 'YiiDebugDbConnection'
     );
 
     public function setPanels(array $pannels)
@@ -104,6 +105,7 @@ class YiiDebugToolbarRoute extends CLogRoute
 
     public function init()
     {
+        $this->initComponents();
         $this->_startTime=microtime(true);
 
         parent::init();
@@ -127,8 +129,6 @@ class YiiDebugToolbarRoute extends CLogRoute
 
     protected function onBeginRequest(CEvent $event)
     {
-        $this->initComponents();
-
         $this->getToolbarWidget()
              ->init();
     }
